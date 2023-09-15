@@ -24,8 +24,8 @@ nodes = {
 @sio.event
 async def connect(sid, environ, auth):
     print('connection established with {}'.format(sid))
-    await asyncio.sleep(1)
-    # await send_nodes(sid)
+    # await asyncio.sleep(1)
+    await send_nodes(sid)
 
 
 @sio.event
@@ -61,10 +61,10 @@ async def post_handler(request):
             nodes[data["type"]][data["node"]][0] = data["status"]
     else:
         nodes[data["type"]][data["node"]] = data["status"]
-    # if "cfm" in data:
-    #     await sio.emit("node_changed", [data["type"], data["node"], data["status"], data["cfm"]])
-    # else:
-    #     await sio.emit("node_changed", [data["type"], data["node"], data["status"]])
+    if "cfm" in data:
+        await sio.emit("node_changed", [data["type"], data["node"], data["status"], data["cfm"]])
+    else:
+        await sio.emit("node_changed", [data["type"], data["node"], data["status"]])
     # await sio.emit("node_changed", [data["type"], data["node"], data["status"]])
     return web.Response(text="Hello, world")
 
@@ -79,11 +79,11 @@ async def send_nodes(sid):
     for node_type in nodes:
         if node_type == "Exhausts" or node_type == "Supplies":
             for node in nodes[node_type]:
-                await sio.emit("node_changed", [node_type, node, nodes[node_type][node], nodes[node_type][node][1]], sid)
+                await sio.emit("node_changed", [node_type, node, nodes[node_type][node][0], nodes[node_type][node][1]], sid)
         else:
             for node in nodes[node_type]:
                 await sio.emit("node_changed", [node_type, node, nodes[node_type][node]], sid)
 
 
 if __name__ == '__main__':
-    web.run_app(app)
+    web.run_app(app, port=4000)

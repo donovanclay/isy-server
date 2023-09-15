@@ -182,13 +182,13 @@ async def main(url, username, password, tls_ver, events, node_servers):
 
 def update_server(node_type, node, status, cfm=None):
     if cfm is None:
-        requests.post("http://localhost:8080/post", json={
+        requests.post("http://localhost:4000/post", json={
             "type": node_type,
             "node": node,
             "status": status
         })
     else:
-        requests.post("http://localhost:8080/post", json={
+        requests.post("http://localhost:4000/post", json={
             "type": node_type,
             "node": node,
             "status": status,
