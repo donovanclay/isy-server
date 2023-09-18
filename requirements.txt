@@ -1,0 +1,5 @@
+python-socketio
+aiohttp
+requests
+python-dotenv
+pyisy

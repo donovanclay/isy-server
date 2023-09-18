@@ -1,7 +1,5 @@
 import asyncio
 import json
-from pprint import pprint
-
 import requests
 import logging
 import os
@@ -124,22 +122,24 @@ async def main(url, username, password, tls_ver, events, node_servers):
         for fan in file_data["exhaust_fans"]:
             name = file_data["exhaust_fans"][fan]["name"]
             cfm = file_data["exhaust_fans"][fan]["cfm"]
-            nodes["Exhausts"][name] = [isy.nodes[name].status, cfm]
+            type_status = file_data["exhaust_fans"][fan]["type"]
+            nodes["Exhausts"][name] = [isy.nodes[name].status, cfm, type_status]
 
         for fan in file_data["supplies"]:
             name = file_data["supplies"][fan]["name"]
             cfm = file_data["supplies"][fan]["cfm"]
-            nodes["Supplies"][name] = [isy.nodes[str(name)].status, cfm]
+            type_status = file_data["supplies"][fan]["type"]
+            nodes["Supplies"][name] = [isy.nodes[str(name)].status, cfm, type_status]
 
         for fan in file_data["honeywell_sens"]:
             nodes["Humidity Sensors"][fan["sens_hum"]] = isy.nodes[fan["sens_hum"]].aux_properties["CLIHUM"].value
             nodes["Motion Sensors"][fan["sens_motion"]] = isy.nodes[fan["sens_motion"]].status
 
         for node in nodes["Exhausts"]:
-            update_server("Exhausts", node, isy.nodes[node].status, nodes["Exhausts"][node][1])
+            update_server("Exhausts", node, isy.nodes[node].status, nodes["Exhausts"][node][1], nodes["Exhausts"][node][2])
 
         for node in nodes["Supplies"]:
-            update_server("Supplies", node, isy.nodes[node].status, nodes["Supplies"][node][1])
+            update_server("Supplies", node, isy.nodes[node].status, nodes["Supplies"][node][1], nodes["Supplies"][node][2])
 
         for node in nodes["Humidity Sensors"]:
             update_server("Humidity Sensors", node, isy.nodes[node].aux_properties["CLIHUM"].value)
@@ -180,19 +180,20 @@ async def main(url, username, password, tls_ver, events, node_servers):
         await isy.shutdown()
 
 
-def update_server(node_type, node, status, cfm=None):
-    if cfm is None:
-        requests.post("http://localhost:4000/post", json={
+def update_server(node_type, node, status, cfm=None, type_status=None):
+    if cfm is None and type_status is None:
+        requests.post("http://host.docker.internal:4000/post", json={
             "type": node_type,
             "node": node,
             "status": status
         })
     else:
-        requests.post("http://localhost:4000/post", json={
+        requests.post("http://host.docker.internal:4000/post", json={
             "type": node_type,
             "node": node,
             "status": status,
-            "cfm": cfm
+            "cfm": cfm,
+            "type_status": type_status
         })
 
 
