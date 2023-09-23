@@ -34,6 +34,7 @@ async def main(url, username, password, tls_ver, events, node_servers):
     _LOGGER.info("Starting PyISY...")
     t_0 = time.time()
     host = urlparse(url)
+    print(host)
     if host.scheme == "http":
         https = False
         port = host.port or 80
@@ -47,6 +48,7 @@ async def main(url, username, password, tls_ver, events, node_servers):
     # Use the helper function to get a new aiohttp.ClientSession.
     websession = get_new_client_session(https, tls_ver)
 
+    print(host.hostname)
     # Connect to ISY controller.
     isy = ISY(
         host.hostname,
@@ -182,13 +184,13 @@ async def main(url, username, password, tls_ver, events, node_servers):
 
 def update_server(node_type, node, status, cfm=None, type_status=None):
     if cfm is None and type_status is None:
-        requests.post("http://host.docker.internal:4000/post", json={
+        requests.post("http://webhook:4000/post", json={
             "type": node_type,
             "node": node,
             "status": status
         })
     else:
-        requests.post("http://host.docker.internal:4000/post", json={
+        requests.post("http://webhook:4000/post", json={
             "type": node_type,
             "node": node,
             "status": status,

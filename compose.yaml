@@ -8,6 +8,10 @@
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
 services:
+  webhook:
+    image: c1d99c469683495b799d4f02eea818613f218e41b5a43b94483c91d1d72193bb
+    ports:
+      - 4000:4000
   server:
     build:
       context: .
@@ -48,4 +52,16 @@ services:
 # secrets:
 #   db-password:
 #     file: db/password.txt
+
+# services:
+#   webhook:
+#     image: c1d99c469683495b799d4f02eea818613f218e41b5a43b94483c91d1d72193bb
+#     ports:
+#       - 4000:4000
+#   server:
+#     image: dac1325bfa35b33273b0ce1423f8d05335368e874d7ef7543c479b85379ec086
+#     env_file:
+#       - .env
+#     ports:
+#       - 4001:4001
 
